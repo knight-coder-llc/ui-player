@@ -18,7 +18,7 @@ import StopIcon from '@material-ui/icons/Stop';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import screenfull from 'screenfull';
-
+import { add, subtract } from 'ramda';
 import useLongPress from "./useLongPress";
 
 const useStyles = makeStyles((theme) => ({
@@ -45,11 +45,12 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-  
+let timerId;
+
 export const Player = () => {
     const classes = useStyles();
     // initialize context variables.
-    const [volumeLevel, setVolumeLevel] = React.useState(10.0);
+    const [volumeLevel, setVolumeLevel] = React.useState(0.08);
     const [playing, setPlaying] = React.useState(false);
     const [played, setPlayed] = React.useState(0);
     const [duration, setDuration] = React.useState(0);
@@ -69,17 +70,27 @@ export const Player = () => {
     }
     
     const handleSeekMouseDown = e => {
+        const direction = e.target.closest('button').getAttribute('id');
         setSeeking(true);
-        playerRef.current.seekTo(parseFloat(e.target.value))
+        timerId = setInterval(() => {
+            if(direction !== 'rewind') {
+                handleSeekChange(add(played,0.5))
+            } else {
+                handleSeekChange(subtract(played,0.5))
+            }      
+        }, 500);
+        
     }
     
-    const handleSeekChange = e => {
-        setPlayed(parseFloat(e.target.value));
+    const handleSeekChange = interval => {
+        console.log('change', interval)
+        setPlayed(parseFloat(interval));
     }
     
     const handleSeekMouseUp = e => {
+
         setSeeking(false);
-        
+        clearInterval(timerId)
     }
 
     const onLongPress = () => {
@@ -94,8 +105,7 @@ export const Player = () => {
         shouldPreventDefault: true,
         delay: 500,
     };
-    const longPressEvent = useLongPress(onLongPress, onClick, defaultOptions);
-
+    
     const playerRef = useRef(null);
 
     return  <Layout>
@@ -112,7 +122,8 @@ export const Player = () => {
                         width="100%" 
                         height="100%" 
                         volume={volumeLevel}
-                        playing={playing}/>
+                        playing={playing}
+                        onSeek={e => console.log('onSeek', e)}/>
                     <ReactPlayer 
                         url="https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_700KB.mp3" width="400px"
                         height="10px"
@@ -127,26 +138,27 @@ export const Player = () => {
                             <Grid item>
                                 <Button color="primary" variant="outlined" onClick={handleStop}><StopIcon/></Button>
                                 <Button 
-                                    {...longPressEvent}
                                     className={classes.rewind} 
+                                    id="rewind"
                                     color="primary" 
                                     variant="outlined"
                                     value={played}
                                     onMouseDown={handleSeekMouseDown}
                                     onChange={handleSeekChange}
-                                    onMouseUp={handleSeekMouseUp} >
+                                    onMouseUp={handleSeekMouseUp} 
+                                    >
                                         <DoubleArrowIcon/>
                                 </Button>
                                 <Button color="primary" variant="outlined" onClick={handlePlayPause}> {!playing ? <PlayCircleFilledIcon/> : <PauseCircleFilledIcon />}</Button>
                                 <Button 
-                                    {...longPressEvent}
                                     id="fastforward" 
                                     color="primary" 
                                     variant="outlined"
                                     value={played}
                                     onMouseDown={handleSeekMouseDown}
                                     onChange={handleSeekChange}
-                                    onMouseUp={handleSeekMouseUp}>
+                                    onMouseUp={handleSeekMouseUp}
+                                    >
                                         <DoubleArrowIcon/>
                                     </Button>
                                 <Button color="primary" variant="outlined" onClick={handleClickFullscreen}><FullscreenIcon/></Button>
@@ -158,7 +170,7 @@ export const Player = () => {
                                         <VolumeDown />
                                     </Grid>
                                     <Grid item xs>
-                                        <Slider value={volumeLevel} onChange={handleVolumeChange} aria-labelledby="continuous-slider" />
+                                        <Slider value={volumeLevel} onChange={handleVolumeChange} min={0} max={1} step={0.01} aria-labelledby="continuous-slider" />
                                     </Grid>
                                     <Grid item>
                                         <VolumeUp />
