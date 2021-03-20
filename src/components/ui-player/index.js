@@ -13,10 +13,13 @@ import Slider from '@material-ui/core/Slider';
 import VolumeDown from '@material-ui/icons/VolumeDown';
 import VolumeUp from '@material-ui/icons/VolumeUp';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
+import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import screenfull from 'screenfull';
+
+import useLongPress from "./useLongPress";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,11 +49,13 @@ const useStyles = makeStyles((theme) => ({
 export const Player = () => {
     const classes = useStyles();
     // initialize context variables.
-    const [volumeLevel, setVolumeLevel] = React.useState(30.0);
+    const [volumeLevel, setVolumeLevel] = React.useState(10.0);
     const [playing, setPlaying] = React.useState(false);
+    const [played, setPlayed] = React.useState(0);
     const [duration, setDuration] = React.useState(0);
     const [url, setUrl] = React.useState(null);
-    
+    const [seeking, setSeeking] = React.useState(false);
+
     // UI Player control handlers.
     const handlePlayPause = () => (setPlaying(!playing));
     const handlePlay = () => (setPlaying(true));
@@ -62,6 +67,34 @@ export const Player = () => {
     const handleClickFullscreen = () => {
         screenfull.request(findDOMNode(playerRef.current))
     }
+    
+    const handleSeekMouseDown = e => {
+        setSeeking(true);
+        playerRef.current.seekTo(parseFloat(e.target.value))
+    }
+    
+    const handleSeekChange = e => {
+        setPlayed(parseFloat(e.target.value));
+    }
+    
+    const handleSeekMouseUp = e => {
+        setSeeking(false);
+        
+    }
+
+    const onLongPress = () => {
+        console.log('longpress is triggered');
+    };
+
+    const onClick = () => {
+        console.log('click is triggered')
+    }
+
+    const defaultOptions = {
+        shouldPreventDefault: true,
+        delay: 500,
+    };
+    const longPressEvent = useLongPress(onLongPress, onClick, defaultOptions);
 
     const playerRef = useRef(null);
 
@@ -84,7 +117,8 @@ export const Player = () => {
                         url="https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_700KB.mp3" width="400px"
                         height="10px"
                         playing={false}
-                        controls={false} />
+                        controls={false} 
+                        onSeek={e => console.log('onSeek', e)}/>
                     <ButtonGroup color="primary" aria-label="outlined primary button group">
                         <Grid container spacing={4}>
                             <Grid item>
@@ -92,9 +126,29 @@ export const Player = () => {
                             </Grid>
                             <Grid item>
                                 <Button color="primary" variant="outlined" onClick={handleStop}><StopIcon/></Button>
-                                <Button className={classes.rewind} color="primary" variant="outlined"><DoubleArrowIcon/></Button>
-                                <Button color="primary" variant="outlined" onClick={handlePlay}> <PlayCircleFilledIcon/></Button>
-                                <Button id="fastforward" color="primary" variant="outlined"><DoubleArrowIcon/></Button>
+                                <Button 
+                                    {...longPressEvent}
+                                    className={classes.rewind} 
+                                    color="primary" 
+                                    variant="outlined"
+                                    value={played}
+                                    onMouseDown={handleSeekMouseDown}
+                                    onChange={handleSeekChange}
+                                    onMouseUp={handleSeekMouseUp} >
+                                        <DoubleArrowIcon/>
+                                </Button>
+                                <Button color="primary" variant="outlined" onClick={handlePlayPause}> {!playing ? <PlayCircleFilledIcon/> : <PauseCircleFilledIcon />}</Button>
+                                <Button 
+                                    {...longPressEvent}
+                                    id="fastforward" 
+                                    color="primary" 
+                                    variant="outlined"
+                                    value={played}
+                                    onMouseDown={handleSeekMouseDown}
+                                    onChange={handleSeekChange}
+                                    onMouseUp={handleSeekMouseUp}>
+                                        <DoubleArrowIcon/>
+                                    </Button>
                                 <Button color="primary" variant="outlined" onClick={handleClickFullscreen}><FullscreenIcon/></Button>
                                 <Typography id="continuous-slider" gutterBottom>
                                     Volume
@@ -117,7 +171,6 @@ export const Player = () => {
                         </Grid>
                     </ButtonGroup>
                     <ButtonGroup color="primary" aria-label="outlined primary button group">
-                        
                         <BottomDrawer />
                     </ButtonGroup>
                 </div>
