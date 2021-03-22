@@ -12,6 +12,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles({
   list: {
@@ -76,7 +77,9 @@ export default function BottomDrawer() {
   return (
     <div>
         <React.Fragment key="bottom">
-            <Button color="primary" variant="outlined" onClick={toggleDrawer('bottom', true)}><MenuIcon/></Button>
+          <Tooltip title="menu" arrow>
+            <Button color="primary" variant="contained" onClick={toggleDrawer('bottom', true)} size="large"><MenuIcon/></Button>
+          </Tooltip>
             <Drawer anchor="bottom" open={state['bottom']} onClose={toggleDrawer('bottom', false)}>
                 {list('bottom')}
             </Drawer>

@@ -19,22 +19,22 @@ import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import StopIcon from '@material-ui/icons/Stop';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Tooltip from '@material-ui/core/Tooltip';
+import Duration from './Duration'
 import screenfull from 'screenfull';
 import { add, subtract } from 'ramda';
 import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
-import { ToggleOff } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         position: 'relative',
         alignItems: 'center',
-        paddingLeft: '15px',
-        paddingRight: '15px',
+        // paddingLeft: '15px',
+        // paddingRight: '15px',
         display: 'flex',
-        height: '100%',
-        width: '100%',
-        color: '#3f51b5',
+        // height: '100%',
+        // width: '100%',
+        // color: '#3f51b5',
         flexDirection: 'column',
         '& > *': {
             margin: theme.spacing(1),
@@ -89,12 +89,11 @@ export const Player = () => {
             } else {
                 handleSeekChange(subtract(played,0.09))
             }      
-        }, 500);
+        }, 100);
         
     }
     
     const handleSeekChange = interval => {
-        console.log('change', interval)
         setPlayed(parseFloat(interval));
     }
     
@@ -110,6 +109,12 @@ export const Player = () => {
         setAudioTrack(track)
      }
 
+    const handleDuration = (duration) => (setDuration(duration));
+    const handleProgress =  (state) => {
+        if (!seeking) {
+            setPlayed(state.played)
+        }
+    }
     const playerRef = useRef(null);
 
     return  <Layout>
@@ -130,80 +135,100 @@ export const Player = () => {
                                 height="100%" 
                                 volume={volumeLevel}
                                 playing={playing}
+                                onPlay={handlePlay}
+                                onDuration={handleDuration}
+                                onProgress={handleProgress}
                                 onSeek={e => console.log('onSeeking??', e)}/>
                                 
                         </Grid>
                     </Grid>
-                    <ButtonGroup color="primary" aria-label="contained primary button group" >
-                    
-                        <Grid container spacing={2}>
-                            <Grid item>
-                                <Button color="primary" variant="contained" onClick={handleStop} size="large"><StopIcon/></Button>
-                            </Grid>
-                            <Grid item>
-                                <Button 
-                                    className={classes.rewind} 
-                                    id="rewind"
-                                    color="primary" 
-                                    size="large"
-                                    variant="contained"
-                                    value={played}
-                                    onMouseDown={handleSeekMouseDown}
-                                    onChange={handleSeekChange}
-                                    onMouseUp={handleSeekMouseUp} 
-                                    >
-                                        <DoubleArrowIcon/>
-                                </Button>
-                            </Grid>
-                            <Grid item>
-                                <Button color="primary" variant="contained" onClick={handlePlayPause} size="large"> {!playing ? <PlayCircleFilledIcon/> : <PauseCircleFilledIcon />}</Button>
-                            </Grid>
-                            <Grid item>
-                                <Button 
-                                    id="fastforward" 
-                                    color="primary" 
-                                    variant="contained"
-                                    size="large"
-                                    value={played}
-                                    onMouseDown={handleSeekMouseDown}
-                                    onChange={handleSeekChange}
-                                    onMouseUp={handleSeekMouseUp}
-                                    >
-                                        <DoubleArrowIcon/>
-                                    </Button>
-                            </Grid>
-                            <Grid item>
-                                <Button color="primary" variant="contained" onClick={handleClickFullscreen} size="large"><FullscreenIcon/></Button>
-                            </Grid>
-                        </Grid>
-                        
-                        
-                    </ButtonGroup>
-                    <ButtonGroup style={{width: '400px'}}>
-                        <Typography id="continuous-slider" gutterBottom>
-                            Volume
-                        </Typography>
-                        <Grid container spacing={2}>
-                            <Grid item>
-                                <VolumeDown />
-                            </Grid>
-                            <Grid item xs>
-                                <Slider value={volumeLevel} onChange={handleVolumeChange} min={0} max={1} step={0.01} aria-labelledby="continuous-slider" />
-                            </Grid>
-                            <Grid item>
-                                <VolumeUp />
-                            </Grid>
-                        </Grid>
-                    </ButtonGroup>
-                    <ButtonGroup color="primary" variant="contained" aria-label="primary button group">
+                    <ButtonGroup color="primary" aria-label="toggle button group">
                         <ToggleButtonGroup  exclusive value={audiotrack} onChange={handleAudioTrackChange} >
                             <ToggleButton value="original"  className={classes.toggles}>Original Audio</ToggleButton>
                             <ToggleButton value="final" >Final Audio</ToggleButton>    
                         </ToggleButtonGroup>
                     </ButtonGroup>
-                    <ButtonGroup color="primary" aria-label="outlined primary button group">
-                        <BottomDrawer />
+                    <Grid>
+                        <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
+                    </Grid>
+                    
+                    <ButtonGroup color="primary" aria-label="contained primary button group" >
+                    
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                <Tooltip title="stop" arrow>
+                                    <Button color="primary" variant="contained" onClick={handleStop} size="large"><StopIcon/></Button>
+                                </Tooltip>
+                                
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="rewind" arrow>
+                                    <Button 
+                                        className={classes.rewind} 
+                                        id="rewind"
+                                        color="primary" 
+                                        size="large"
+                                        variant="contained"
+                                        value={played}
+                                        onMouseDown={handleSeekMouseDown}
+                                        onChange={handleSeekChange}
+                                        onMouseUp={handleSeekMouseUp} 
+                                        >
+                                            <DoubleArrowIcon/>
+                                    </Button>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="play/pause" arrow>
+                                    <Button color="primary" variant="contained" onClick={handlePlayPause} size="large"> {!playing ? <PlayCircleFilledIcon/> : <PauseCircleFilledIcon />}</Button>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="forward" arrow>
+                                    <Button 
+                                        id="fastforward" 
+                                        color="primary" 
+                                        variant="contained"
+                                        size="large"
+                                        value={played}
+                                        onMouseDown={handleSeekMouseDown}
+                                        onChange={handleSeekChange}
+                                        onMouseUp={handleSeekMouseUp}
+                                        >
+                                        <DoubleArrowIcon/>
+                                    </Button>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="fullscreen" arrow>
+                                    <Button color="primary" variant="contained" onClick={handleClickFullscreen} size="large"><FullscreenIcon/></Button>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <BottomDrawer />
+                            </Grid>
+                        </Grid>
+                        
+                        
                     </ButtonGroup>
+                    <ButtonGroup style={{width: '40%'}}>
+                        {/* <Typography id="continuous-slider" gutterBottom>
+                            Volume
+                        </Typography> */}
+                        <Grid container spacing={2} >
+                            <Grid item>
+                                <VolumeDown />
+                            </Grid>
+                            <Grid item xs >
+                                <Slider value={volumeLevel} onChange={handleVolumeChange} min={0} max={1} step={0.01} aria-labelledby="continuous-slider" />
+                            </Grid>
+                            <Grid item>
+                                <VolumeUp />
+                            </Grid>
+                            
+                        </Grid>
+                    </ButtonGroup>
+                    
                 </div>
             </Layout>
 }

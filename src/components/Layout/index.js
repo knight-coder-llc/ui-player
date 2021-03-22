@@ -11,7 +11,8 @@ export const Layout = ({children}) => (
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="lg" >
-        <Box style={{
+      { children }
+        {/* <Box style={{
             backgroundImage: 'linear-gradient(to top, #00c6fb 0%, #005bea 100%)',
             // backgroundImage: 'linear-gradient(to top, #48c6ef 0%, #6f86d6 100%)',
             borderRadius: '7%', 
@@ -20,7 +21,7 @@ export const Layout = ({children}) => (
             bgcolor="#dedede" 
             p={1}>
             { children }
-        </Box> 
+        </Box>  */}
       </Container>
     </React.Fragment>
 )
