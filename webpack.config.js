@@ -19,7 +19,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(png|jpe?g|gif|eot|svg|ttf|woff)$/i,
+                test: /\.(png|jpe?g|gif|eot|svg|ttf|woff|mov|mp4)$/i,
                 loader: 'file-loader',
                 options: {
                     outputPath: 'images',

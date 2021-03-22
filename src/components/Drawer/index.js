@@ -8,6 +8,7 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -18,6 +19,9 @@ const useStyles = makeStyles({
   },
   fullList: {
     width: 'auto',
+  },
+  input: {
+    display: 'none',
   },
 });
 
@@ -43,12 +47,19 @@ export default function BottomDrawer() {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        <ListItem button key={'Upload'}>
+            <ListItemIcon><CloudUploadIcon /></ListItemIcon>
+            <input
+              accept="video/*"
+              className={classes.input}
+              id="contained-button-file"
+              multiple
+              type="file"
+            />
+            <label htmlFor="contained-button-file">
+              <ListItemText primary={'Upload'} />
+            </label>
+        </ListItem>
       </List>
       <Divider />
       <List>
