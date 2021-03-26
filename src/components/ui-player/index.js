@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { findDOMNode } from 'react-dom';
 import ReactPlayer from 'react-player';
 import { Layout } from '../Layout';
@@ -20,21 +20,18 @@ import StopIcon from '@material-ui/icons/Stop';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import Tooltip from '@material-ui/core/Tooltip';
-import Duration from './Duration'
+import Duration, { format } from './Duration'
 import screenfull from 'screenfull';
-import { add, subtract } from 'ramda';
+import { add, subtract, isNil } from 'ramda';
+import { ffmpegTranscodeFile } from '../../utils';
+import moment from 'moment';
 import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         position: 'relative',
         alignItems: 'center',
-        // paddingLeft: '15px',
-        // paddingRight: '15px',
         display: 'flex',
-        // height: '100%',
-        // width: '100%',
-        // color: '#3f51b5',
         flexDirection: 'column',
         '& > *': {
             margin: theme.spacing(1),
@@ -57,13 +54,26 @@ let timerId;
 export const Player = () => {
     const classes = useStyles();
     // initialize context variables.
-    const [volumeLevel, setVolumeLevel] = React.useState(0.08);
-    const [playing, setPlaying] = React.useState(false);
-    const [played, setPlayed] = React.useState(0);
-    const [duration, setDuration] = React.useState(0);
-    const [url, setUrl] = React.useState(null);
-    const [seeking, setSeeking] = React.useState(false);
-    const [audiotrack, setAudioTrack] = useState('original')
+    const [volumeLevel, setVolumeLevel] = useState(1);
+    const [playing, setPlaying] = useState(false);
+    const [played, setPlayed] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [url, setUrl] = useState(null);
+    const [seeking, setSeeking] = useState(false);
+    const [audiotrack, setAudioTrack] = useState(1)
+    const [videoSrc, setVideoSrc] = useState(sampleVideo);
+    const [originalSrc, setOriginalVideoSrc] = useState(null);
+
+    useEffect(async () => {
+        if(isNil(originalSrc)) {
+            const original = await ffmpegTranscodeFile(sampleVideo);
+            setOriginalVideoSrc(original);
+        }
+        console.log('mounting!!')
+        return () => {
+
+        }
+    }, []);
 
     // UI Player control handlers.
     const handlePlayPause = () => (setPlaying(!playing));
@@ -99,14 +109,27 @@ export const Player = () => {
     
     const handleSeekMouseUp = e => {
         if(seeking) {
-            playerRef.current.seekTo(parseFloat(played));
+            playerRef.current.seekTo(parseFloat(duration * played));
             clearTimeout(timerId);
             setSeeking(false);
         }   
     }
 
-    const handleAudioTrackChange = (e, track) => { 
-        setAudioTrack(track)
+    const handleAudioTrackChange = async (e, track) => { 
+        
+        setAudioTrack(track);
+        if(track > 0) {
+            setVideoSrc(sampleVideo);
+        } else {
+            setVideoSrc(originalSrc);
+        }
+        // console.log('played', duration * played)
+        
+        // console.log('player', playerRef.current)
+        // console.log('got here',track)
+        // const vid = await ffmpegTranscodeFile(videoSrc,'00:00:00', track);
+        // console.log('transcoder boom',vid)
+        // setVideoSrc(vid);
      }
 
     const handleDuration = (duration) => (setDuration(duration));
@@ -115,6 +138,7 @@ export const Player = () => {
             setPlayed(state.played)
         }
     }
+
     const playerRef = useRef(null);
 
     return  <Layout>
@@ -129,7 +153,7 @@ export const Player = () => {
                             <ReactPlayer 
                                 ref={playerRef}
                                 className="react-player"
-                                url={sampleVideo}
+                                url={videoSrc}
                                 controls={false} 
                                 width="100%" 
                                 height="100%" 
@@ -141,11 +165,14 @@ export const Player = () => {
                                 onSeek={e => console.log('onSeeking??', e)}/>
                                 
                         </Grid>
+                        
                     </Grid>
+                    
                     <ButtonGroup color="primary" aria-label="toggle button group">
+                    
                         <ToggleButtonGroup  exclusive value={audiotrack} onChange={handleAudioTrackChange} >
-                            <ToggleButton value="original"  className={classes.toggles}>Original Audio</ToggleButton>
-                            <ToggleButton value="final" >Final Audio</ToggleButton>    
+                            <ToggleButton value={0}  className={classes.toggles}>Original Audio</ToggleButton>
+                            <ToggleButton value={1} >Final Audio</ToggleButton>    
                         </ToggleButtonGroup>
                     </ButtonGroup>
                     <Grid>
