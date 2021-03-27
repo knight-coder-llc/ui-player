@@ -26,6 +26,10 @@ import { add, subtract, isNil } from 'ramda';
 import { ffmpegTranscodeFile } from '../../utils';
 import logo from '../../assets/AVlogo-2.png';
 import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
+import ThreeSixtyIcon from '@material-ui/icons/ThreeSixty';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
+import { motion } from 'framer-motion';
+import { Message } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,7 +64,8 @@ export const Player = () => {
     const [duration, setDuration] = useState(0);
     const [url, setUrl] = useState(null);
     const [seeking, setSeeking] = useState(false);
-    const [audiotrack, setAudioTrack] = useState(1)
+    const [audiotrack, setAudioTrack] = useState(1);
+    const [trackUpdated, setTrackUpdate] = useState(false);
     const [videoSrc, setVideoSrc] = useState(sampleVideo);
     const [originalSrc, setOriginalVideoSrc] = useState(null);
 
@@ -87,7 +92,7 @@ export const Player = () => {
     };
     const handleVolumeChange = (e, newValue) => (setVolumeLevel(parseFloat(newValue)));
     const handleClickFullscreen = () => {
-        screenfull.request(findDOMNode(playerRef.current))
+        screenfull.request(findDOMNode(playerRef.current));
     }
     
     const handleSeekMouseDown = e => {
@@ -116,24 +121,24 @@ export const Player = () => {
     }
 
     const handleAudioTrackChange = async (e, track) => { 
-        
-        setAudioTrack(track);
-        if(track > 0) {
-            setVideoSrc(sampleVideo);
-        } else {
-            setVideoSrc(originalSrc);
-        }
-        // console.log('played', duration * played)
-        
-        // console.log('player', playerRef.current)
-        // console.log('got here',track)
-        // const vid = await ffmpegTranscodeFile(videoSrc,'00:00:00', track);
-        // console.log('transcoder boom',vid)
-        // setVideoSrc(vid);
+        console.log('played',duration * played)
+        console.log(playerRef.current.getDuration());
+        const seconds = duration * played;
+        const originalVideoDur = playerRef.current.getDuration();
+        if(track !== null) {
+            setAudioTrack(track);
+            if(track > 0) {
+                setVideoSrc(sampleVideo);
+            } else {
+                setVideoSrc(originalSrc);
+            }
+            setTrackUpdate(true);
+        } 
      }
 
     const handleDuration = (duration) => (setDuration(duration));
     const handleProgress =  (state) => {
+        console.log('progress check')
         if (!seeking) {
             setPlayed(state.played)
         }
@@ -142,32 +147,54 @@ export const Player = () => {
     const playerRef = useRef(null);
 
     return  <Layout>
-                <div className={classes.root}>
+                <div className={classes.root} id="videoContainer" >
                     <Typography component="div" >
                         <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
                             <img src={logo} />
                         </Box>
                     </Typography>
                     <Grid className="player-wrapper" >
-                        <Grid item>
-                            <ReactPlayer 
-                                ref={playerRef}
-                                className="react-player"
-                                url={videoSrc}
-                                controls={false} 
-                                width="100%" 
-                                height="100%" 
-                                volume={volumeLevel}
-                                playing={playing}
-                                onPlay={handlePlay}
-                                onDuration={handleDuration}
-                                onProgress={handleProgress}
-                                onSeek={e => console.log('onSeeking??', e)}/>
-                                
-                        </Grid>
-                        
+                    {
+                        (!isNil(originalSrc)) ?   <Grid item>
+                                        
+                                        <ReactPlayer 
+                                            ref={playerRef}
+                                            className="react-player"
+                                            url={videoSrc}
+                                            controls={false} 
+                                            width="100%" 
+                                            height="100%" 
+                                            volume={volumeLevel}
+                                            playing={playing}
+                                            progressInterval={500}
+                                            onReady={() => {
+                                                if(trackUpdated) {
+                                                    const seconds = (duration * played);
+                                                    
+                                                    playerRef.current.seekTo(seconds);
+                                                    setTrackUpdate(false);
+                                                }
+                                            }}
+                                            onPlay={handlePlay}
+                                            onDuration={handleDuration}
+                                            onProgress={handleProgress}
+                                            onSeek={e => console.log('onSeeking??', e)}/>
+                                        
+                                    </Grid> : 
+                                    <Grid item height={'100%'} style={{display: 'flex', justifyContent:'center',     marginTop: '-35vh'}}>
+                                        <motion.div 
+                                            animate={{ rotate: 360 }}
+                                            transition={{
+                                                loop: Infinity,
+                                                ease: "linear",
+                                                duration: 1
+                                            }}
+                                        >
+                                           <AutorenewIcon style={{fontSize: '5rem', color:'#fff'}} /> 
+                                        </motion.div>
+                                    </Grid>
+                    }
                     </Grid>
-                    
                     <ButtonGroup color="primary" aria-label="toggle button group">
                     
                         <ToggleButtonGroup  exclusive value={audiotrack} onChange={handleAudioTrackChange} >
@@ -183,7 +210,7 @@ export const Player = () => {
                         </Typography>
                     </Grid>
                     
-                    <ButtonGroup color="primary" aria-label="contained primary button group" className="controls">
+                    <ButtonGroup color="primary" aria-label="contained primary button group" id="controls" >
                     
                         <Grid container spacing={2}>
                             <Grid item>
@@ -235,9 +262,9 @@ export const Player = () => {
                                     <Button color="primary" variant="contained" onClick={handleClickFullscreen} size="large"><FullscreenIcon/></Button>
                                 </Tooltip>
                             </Grid>
-                            <Grid item>
+                            {/* <Grid item>
                                 <BottomDrawer />
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                         
                         

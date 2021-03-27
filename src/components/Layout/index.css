@@ -28,7 +28,20 @@ body {
 
 .Mui-Selected { background-color: #330867!important; }
 
-.makeStyles-root-1:-webkit-full-screen .controls { display: block; }
-.makeStyles-root-1:-moz-full-screen .controls { display: block; }
-.makeStyles-root-1:full-screen .controls { display: block; }
-.makeStyles-root-1:fullscreen .controls { display: block; }
+/* 
+Fullscreen Pseudo-class: 
+https://developer.mozilla.org/en-US/docs/Web/CSS/:fullscreen 
+*/
+#controls:-moz-full-screen { position: fixed; }
+#controls:-webkit-full-screen { position: fixed; }
+#controls:-ms-fullscreen { position: fixed; }
+#controls:fullscreen { position: fixed; }
+/* 
+Special Shadow DOM Settings to Override Default Controls: 
+https://css-tricks.com/custom-controls-in-html5-video-full-screen/ 
+*/
+video::-webkit-media-controls {
+    display:none !important;
+}
+video::-webkit-media-controls-enclosure { display:none !important; }
+#controls { z-index: 2147483648; }
