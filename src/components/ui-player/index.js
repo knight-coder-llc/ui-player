@@ -24,7 +24,7 @@ import Duration, { format } from './Duration'
 import screenfull from 'screenfull';
 import { add, subtract, isNil } from 'ramda';
 import { ffmpegTranscodeFile } from '../../utils';
-import moment from 'moment';
+import logo from '../../assets/AVlogo-2.png';
 import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
 
 const useStyles = makeStyles((theme) => ({
@@ -69,7 +69,7 @@ export const Player = () => {
             const original = await ffmpegTranscodeFile(sampleVideo);
             setOriginalVideoSrc(original);
         }
-        console.log('mounting!!')
+        
         return () => {
 
         }
@@ -145,7 +145,7 @@ export const Player = () => {
                 <div className={classes.root}>
                     <Typography component="div" >
                         <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
-                            Free Video Player 1.0.0
+                            <img src={logo} />
                         </Box>
                     </Typography>
                     <Grid className="player-wrapper" >
@@ -176,10 +176,14 @@ export const Player = () => {
                         </ToggleButtonGroup>
                     </ButtonGroup>
                     <Grid>
-                        <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
+                        <Typography component="div" >
+                            <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
+                                <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
+                            </Box>
+                        </Typography>
                     </Grid>
                     
-                    <ButtonGroup color="primary" aria-label="contained primary button group" >
+                    <ButtonGroup color="primary" aria-label="contained primary button group" className="controls">
                     
                         <Grid container spacing={2}>
                             <Grid item>
@@ -238,7 +242,7 @@ export const Player = () => {
                         
                         
                     </ButtonGroup>
-                    <ButtonGroup style={{width: '40%'}}>
+                    <ButtonGroup style={{width: '40%', color: '#fff'}} className="controls">
                         {/* <Typography id="continuous-slider" gutterBottom>
                             Volume
                         </Typography> */}

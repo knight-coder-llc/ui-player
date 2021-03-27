@@ -1,5 +1,6 @@
 body {
-    background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
+    background-image: url('../../assets/background.jpg');
+    /* background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%); */
     /* background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%); */
     /* background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%) */
 }
@@ -26,3 +27,8 @@ body {
 }
 
 .Mui-Selected { background-color: #330867!important; }
+
+.makeStyles-root-1:-webkit-full-screen .controls { display: block; }
+.makeStyles-root-1:-moz-full-screen .controls { display: block; }
+.makeStyles-root-1:full-screen .controls { display: block; }
+.makeStyles-root-1:fullscreen .controls { display: block; }
