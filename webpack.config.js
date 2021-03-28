@@ -12,6 +12,17 @@ module.exports = {
     mode:'development',
     devtool: 'inline-source-map',
     devServer: {
+         before(app) {
+            // ========================================================
+            // use proper headers for SharedArrayBuffer on Firefox
+            // see https://github.com/ffmpegwasm/ffmpeg.wasm/issues/102
+            // ========================================================
+            app.use((req, res, next) => {
+                res.header('Cross-Origin-Opener-Policy', 'same-origin');
+                res.header('Cross-Origin-Embedder-Policy', 'require-corp');
+                next();
+            });
+        },
         contentBase: path.join(__dirname, './build'),
         compress: true,
         port: 3000,

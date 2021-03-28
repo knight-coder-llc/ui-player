@@ -121,10 +121,6 @@ export const Player = () => {
     }
 
     const handleAudioTrackChange = async (e, track) => { 
-        console.log('played',duration * played)
-        console.log(playerRef.current.getDuration());
-        const seconds = duration * played;
-        const originalVideoDur = playerRef.current.getDuration();
         if(track !== null) {
             setAudioTrack(track);
             if(track > 0) {
@@ -138,7 +134,6 @@ export const Player = () => {
 
     const handleDuration = (duration) => (setDuration(duration));
     const handleProgress =  (state) => {
-        console.log('progress check')
         if (!seeking) {
             setPlayed(state.played)
         }
