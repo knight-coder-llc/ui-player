@@ -12,6 +12,7 @@ import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import VolumeDown from '@material-ui/icons/VolumeDown';
 import VolumeUp from '@material-ui/icons/VolumeUp';
+import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
@@ -25,6 +26,8 @@ import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
 import ReplayIcon from '@material-ui/icons/Replay';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import StopIcon from '@material-ui/icons/Stop';
+import { isMobile } from 'react-device-detect';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -61,7 +64,7 @@ export const Player = () => {
 
     // initialize context variables.
     const [volumeLevel, setVolumeLevel] = useState(1);
-    const [playing, setPlaying] = useState(false);
+    const [playing, setPlaying] = useState(true);
     const [played, setPlayed] = useState(0);
     const [duration, setDuration] = useState(0);
     const [seeking, setSeeking] = useState(false);
@@ -72,6 +75,7 @@ export const Player = () => {
     const [videoSrc, setVideoSrc] = useState(sampleVideo);
     const [originalSrc, setOriginalVideoSrc] = useState(null);
     const [backdropOpen, setBackdropOpen] = useState(false);
+    const [mute, setMute] = useState(true);
 
     // mount and unmount lifecycle.
     useEffect(async () => {
@@ -105,9 +109,16 @@ export const Player = () => {
         playerRef.current.seekTo(parseFloat(duration * played));
     };
 
+    const handleMute = () => (setMute(false));
+    const toggleMute = () => (setMute(!mute));
+
     // UI Player control handlers.
     const handlePlayPause = () => (setPlaying(!playing));
     const handlePlay = () => (setPlaying(true));
+    const handleReturnToStart = () => {
+        setPlayed(0);
+        playerRef.current.seekTo(parseFloat(0));
+    }
     const handleStop = () => {
         setPlaying(false);
         setPlayed(0);
@@ -179,6 +190,7 @@ export const Player = () => {
                                                 className="react-player"
                                                 url={videoSrc}
                                                 controls={false} 
+                                                muted={mute}
                                                 width="100%" 
                                                 height="100%" 
                                                 volume={volumeLevel}
@@ -212,7 +224,8 @@ export const Player = () => {
                                                             ref={playerRef}
                                                             className="react-player"
                                                             url={videoSrc}
-                                                            controls={false} 
+                                                            controls={false}
+                                                            muted={mute} 
                                                             width="100%" 
                                                             height="100%" 
                                                             volume={volumeLevel}
@@ -265,11 +278,17 @@ export const Player = () => {
                         <Grid container spacing={2}>
                             <Grid item>
                                 <Tooltip title="return to start" arrow>
-                                    <Button color="primary" variant="contained" onClick={handleStop} size="large"><ReplayIcon/></Button>
+                                    <Button color="primary" variant="contained" onClick={handleReturnToStart} size="large"><ReplayIcon/></Button>
                                 </Tooltip>
                                 
                             </Grid>
                             <Grid item>
+                                <Tooltip title="stop" arrow>
+                                    <Button color="primary" variant="contained" onClick={handleStop} size="large"><StopIcon/></Button>
+                                </Tooltip>
+                                
+                            </Grid>
+                            {/* <Grid item>
                                 <Tooltip title="rewind" arrow>
                                     <Button 
                                         className={classes.rewind} 
@@ -285,7 +304,7 @@ export const Player = () => {
                                             <DoubleArrowIcon/>
                                     </Button>
                                 </Tooltip>
-                            </Grid>
+                            </Grid> */}
                             <Grid item>
                                 <Tooltip title="play/pause" arrow>
                                     <Button color="primary" variant="contained" onClick={handlePlayPause} size="large"> {!playing ? <PlayCircleFilledIcon/> : <PauseCircleFilledIcon />}</Button>
@@ -327,8 +346,8 @@ export const Player = () => {
                             <Grid item xs >
                                 <Slider value={volumeLevel} onChange={handleVolumeChange} min={0} max={1} step={0.01} aria-labelledby="continuous-slider" />
                             </Grid>
-                            <Grid item>
-                                <VolumeUp />
+                            <Grid item  onClick={toggleMute}>
+                                {(!mute) ? <Tooltip title="click to mute" placement={'top-start'}><VolumeUp /></Tooltip> : <Tooltip title="click to unmute" placement={'top-start'}><VolumeOffIcon /></Tooltip>}
                             </Grid>
                         </Grid>
                     </ButtonGroup>
