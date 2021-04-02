@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { findDOMNode } from 'react-dom';
 import ReactPlayer from 'react-player';
 import { Layout } from '../Layout';
 import Typography from '@material-ui/core/Typography';
@@ -9,27 +8,23 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
-import BottomDrawer from '../Drawer';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import VolumeDown from '@material-ui/icons/VolumeDown';
 import VolumeUp from '@material-ui/icons/VolumeUp';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
-import StopIcon from '@material-ui/icons/Stop';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import Tooltip from '@material-ui/core/Tooltip';
 import Duration, { format } from './Duration'
-import screenfull from 'screenfull';
-import { add, subtract, isNil } from 'ramda';
+import { add, subtract, isNil, equals } from 'ramda';
 import { ffmpegTranscodeFile } from '../../utils';
 import logo from '../../assets/AVlogo-2.png';
 import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
-import ThreeSixtyIcon from '@material-ui/icons/ThreeSixty';
-import AutorenewIcon from '@material-ui/icons/Autorenew';
-import { motion } from 'framer-motion';
-import { Message } from '@material-ui/icons';
+import ReplayIcon from '@material-ui/icons/Replay';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -37,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         display: 'flex',
         flexDirection: 'column',
+        height: '100vh',
         '& > *': {
             margin: theme.spacing(1),
         },
@@ -50,50 +46,75 @@ const useStyles = makeStyles((theme) => ({
     },
     toggles: {
         marginRight: theme.spacing(1.5)
-    }
+    },
+    backdrop: {
+        background: '#000',
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+      },
   }));
 
 let timerId;
 
 export const Player = () => {
     const classes = useStyles();
+
     // initialize context variables.
     const [volumeLevel, setVolumeLevel] = useState(1);
     const [playing, setPlaying] = useState(false);
     const [played, setPlayed] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [url, setUrl] = useState(null);
     const [seeking, setSeeking] = useState(false);
     const [audiotrack, setAudioTrack] = useState(1);
     const [trackUpdated, setTrackUpdate] = useState(false);
+    const [fullScreenSeek, setFullScreenSeek] = useState(false);
+    const [pageSeek, setPageSeek] = useState(false);
     const [videoSrc, setVideoSrc] = useState(sampleVideo);
     const [originalSrc, setOriginalVideoSrc] = useState(null);
+    const [backdropOpen, setBackdropOpen] = useState(false);
 
+    // mount and unmount lifecycle.
     useEffect(async () => {
         if(isNil(originalSrc)) {
             const original = await ffmpegTranscodeFile(sampleVideo);
             setOriginalVideoSrc(original);
         }
-        
-        return () => {
 
+        document.addEventListener('keydown', onKeyPress);
+        return () => {
+            document.removeEventListener('keydown', onKeyPress);
         }
     }, []);
+
+    const onKeyPress = (event) => {
+        if(equals(event.key, 'Escape')){
+            setBackdropOpen(false);
+        }
+    }
+
+    // fullscreen backdrop close
+    const handleBackdropClose = () => {
+        setBackdropOpen(false);
+    };
+    // toggle the fullscreen backdrop component.
+    const handleBackdropToggle = () => {
+        setBackdropOpen(!backdropOpen);
+
+        // sync video from page to fullscreen.
+        setFullScreenSeek(true);
+        playerRef.current.seekTo(parseFloat(duration * played));
+    };
 
     // UI Player control handlers.
     const handlePlayPause = () => (setPlaying(!playing));
     const handlePlay = () => (setPlaying(true));
     const handleStop = () => {
-        setUrl(null);
         setPlaying(false);
         setPlayed(0);
 
         playerRef.current.seekTo(parseFloat(0));
     };
     const handleVolumeChange = (e, newValue) => (setVolumeLevel(parseFloat(newValue)));
-    const handleClickFullscreen = () => {
-        screenfull.request(findDOMNode(playerRef.current));
-    }
     
     const handleSeekMouseDown = e => {
         const direction = e.target.closest('button').getAttribute('id');
@@ -142,6 +163,7 @@ export const Player = () => {
     const playerRef = useRef(null);
 
     return  <Layout>
+        
                 <div className={classes.root} id="videoContainer" >
                     <Typography component="div" >
                         <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
@@ -149,68 +171,101 @@ export const Player = () => {
                         </Box>
                     </Typography>
                     <Grid className="player-wrapper" >
+                    
                     {
-                        (!isNil(originalSrc)) ?   <Grid item>
-                                        
-                                        <ReactPlayer 
-                                            ref={playerRef}
-                                            className="react-player"
-                                            url={videoSrc}
-                                            controls={false} 
-                                            width="100%" 
-                                            height="100%" 
-                                            volume={volumeLevel}
-                                            playing={playing}
-                                            progressInterval={500}
-                                            onReady={() => {
-                                                if(trackUpdated) {
-                                                    const seconds = (duration * played);
-                                                    
-                                                    playerRef.current.seekTo(seconds);
-                                                    setTrackUpdate(false);
-                                                }
-                                            }}
-                                            onPlay={handlePlay}
-                                            onDuration={handleDuration}
-                                            onProgress={handleProgress}
-                                            onSeek={e => console.log('onSeeking??', e)}/>
-                                        
-                                    </Grid> : 
-                                    <Grid item height={'100%'} style={{display: 'flex', justifyContent:'center',     marginTop: '-35vh'}}>
-                                        <motion.div 
-                                            animate={{ rotate: 360 }}
-                                            transition={{
-                                                loop: Infinity,
-                                                ease: "linear",
-                                                duration: 1
-                                            }}
-                                        >
-                                           <AutorenewIcon style={{fontSize: '5rem', color:'#fff'}} /> 
-                                        </motion.div>
-                                    </Grid>
+                        (backdropOpen) ? <Backdrop className={classes.backdrop} open={backdropOpen} onClick={handleBackdropClose}>
+                                            <ReactPlayer 
+                                                ref={playerRef}
+                                                className="react-player"
+                                                url={videoSrc}
+                                                controls={false} 
+                                                width="100%" 
+                                                height="100%" 
+                                                volume={volumeLevel}
+                                                playing={playing}
+                                                progressInterval={2000}
+                                                onReady={() => {
+                                                    // setting track
+                                                    if(trackUpdated) {
+                                                        const seconds = (duration * played);
+                                                        playerRef.current.seekTo(seconds);
+                                                        setPlayed(played);
+                                                        setTrackUpdate(false); 
+                                                    }
+
+                                                    if(fullScreenSeek) {
+                                                        const seconds = (duration * played); 
+                                                        playerRef.current.seekTo(seconds);
+                                                        setPlayed(played)
+                                                        setFullScreenSeek(false);
+                                                        setPageSeek(true);
+                                                    }
+                                                }}
+                                                onPlay={handlePlay}
+                                                onDuration={handleDuration}
+                                                onProgress={handleProgress}
+                                                onSeek={e => console.log('onSeeking??', e)}/>
+                                        </Backdrop> :
+                        
+                        (!isNil(originalSrc)) ?     <Grid item>
+                                                        <ReactPlayer 
+                                                            ref={playerRef}
+                                                            className="react-player"
+                                                            url={videoSrc}
+                                                            controls={false} 
+                                                            width="100%" 
+                                                            height="100%" 
+                                                            volume={volumeLevel}
+                                                            playing={playing}
+                                                            progressInterval={500}
+                                                            onReady={() => {
+                                                                if(trackUpdated) {
+                                                                    const seconds = (duration * played);
+                                                                    playerRef.current.seekTo(seconds);
+                                                                    setPlayed(played);
+                                                                    setTrackUpdate(false);
+                                                                }
+
+                                                                if(pageSeek) {
+                                                                    const seconds = (duration * played);
+                                                                    playerRef.current.seekTo(seconds);
+                                                                    setPlayed(played);
+                                                                    setPageSeek(false);
+                                                                }
+                                                            }}
+                                                            onPlay={handlePlay}
+                                                            onDuration={handleDuration}
+                                                            onProgress={handleProgress}
+                                                            onSeek={e => console.log('onSeeking??', e)}/>       
+                                                    </Grid> : 
+                                                    <Grid item height={'100%'} style={{position:'absolute', top:'50%', left: '50%'}}>
+                                                        <CircularProgress style={{color:'white'}} />
+                                                    </Grid>
                     }
                     </Grid>
-                    <ButtonGroup color="primary" aria-label="toggle button group">
-                    
+                    <ButtonGroup color="primary" aria-label="toggle button group" id="controls">
                         <ToggleButtonGroup  exclusive value={audiotrack} onChange={handleAudioTrackChange} >
                             <ToggleButton value={0}  className={classes.toggles}>Original Audio</ToggleButton>
                             <ToggleButton value={1} >Final Audio</ToggleButton>    
                         </ToggleButtonGroup>
                     </ButtonGroup>
-                    <Grid>
-                        <Typography component="div" >
-                            <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
-                                <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
-                            </Box>
-                        </Typography>
-                    </Grid>
+                    {
+                        (!backdropOpen) && <Grid>
+                                                <Typography component="div" >
+                                                    <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
+                                                        <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
+                                                    </Box>
+                                                </Typography>
+                                            </Grid> 
+                    }
+                    
                     
                     <ButtonGroup color="primary" aria-label="contained primary button group" id="controls" >
                     
                         <Grid container spacing={2}>
                             <Grid item>
-                                <Tooltip title="stop" arrow>
-                                    <Button color="primary" variant="contained" onClick={handleStop} size="large"><StopIcon/></Button>
+                                <Tooltip title="return to start" arrow>
+                                    <Button color="primary" variant="contained" onClick={handleStop} size="large"><ReplayIcon/></Button>
                                 </Tooltip>
                                 
                             </Grid>
@@ -254,7 +309,7 @@ export const Player = () => {
                             </Grid>
                             <Grid item>
                                 <Tooltip title="fullscreen" arrow>
-                                    <Button color="primary" variant="contained" onClick={handleClickFullscreen} size="large"><FullscreenIcon/></Button>
+                                    <Button color="primary" variant="contained" onClick={handleBackdropToggle} size="large"><FullscreenIcon/></Button>
                                 </Tooltip>
                             </Grid>
                             {/* <Grid item>
@@ -264,10 +319,7 @@ export const Player = () => {
                         
                         
                     </ButtonGroup>
-                    <ButtonGroup style={{width: '40%', color: '#fff'}} className="controls">
-                        {/* <Typography id="continuous-slider" gutterBottom>
-                            Volume
-                        </Typography> */}
+                    <ButtonGroup style={{width: '40%', color: '#fff'}} id="controls">
                         <Grid container spacing={2} >
                             <Grid item>
                                 <VolumeDown />
@@ -278,10 +330,10 @@ export const Player = () => {
                             <Grid item>
                                 <VolumeUp />
                             </Grid>
-                            
                         </Grid>
                     </ButtonGroup>
                     
                 </div>
+                
             </Layout>
 }
