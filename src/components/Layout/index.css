@@ -8,7 +8,7 @@ body {
     position: relative;
     padding-top: 56.25%;
     width: 100%;
-    height: 100%;
+    /* height: 100%; */
     
 }
 
@@ -20,12 +20,12 @@ body {
   }
   .MuiButton-containedPrimary {
     color: #fff;
-    background-color: blue!important;
+    background-color: #18A4CE!important;
 }
 
 .MuiToggleButton-root {
     color: white!important;
-    background-color: blue!important;
+    background-color: #18A4CE!important;
 }
 
 .Mui-Selected { background-color: #330867!important; }

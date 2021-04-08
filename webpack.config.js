@@ -6,10 +6,10 @@ const webpack = require('webpack'); //to access built-in plugins
 module.exports = {
     entry: ["@babel/polyfill",path.resolve(__dirname, './src/index.js')],
     output: {
-        path: path.resolve(__dirname, './build'),
+        path: path.resolve(__dirname, './static-files/build'),
         filename: 'app.js'
     },
-    mode:'development',
+    mode:'production',
     devtool: 'inline-source-map',
     devServer: {
          before(app) {

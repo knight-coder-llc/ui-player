@@ -64,7 +64,7 @@ export const Player = () => {
 
     // initialize context variables.
     const [volumeLevel, setVolumeLevel] = useState(1);
-    const [playing, setPlaying] = useState(true);
+    const [playing, setPlaying] = useState(false);
     const [played, setPlayed] = useState(0);
     const [duration, setDuration] = useState(0);
     const [seeking, setSeeking] = useState(false);
@@ -75,7 +75,7 @@ export const Player = () => {
     const [videoSrc, setVideoSrc] = useState(sampleVideo);
     const [originalSrc, setOriginalVideoSrc] = useState(null);
     const [backdropOpen, setBackdropOpen] = useState(false);
-    const [mute, setMute] = useState(true);
+    const [mute, setMute] = useState(false);
 
     // mount and unmount lifecycle.
     useEffect(async () => {
@@ -176,11 +176,11 @@ export const Player = () => {
     return  <Layout>
         
                 <div className={classes.root} id="videoContainer" >
-                    <Typography component="div" >
+                    {/* <Typography component="div" >
                         <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
                             <img src={logo} />
                         </Box>
-                    </Typography>
+                    </Typography> */}
                     <Grid className="player-wrapper" >
                     
                     {
@@ -227,7 +227,7 @@ export const Player = () => {
                                                             controls={false}
                                                             muted={mute} 
                                                             width="100%" 
-                                                            height="100%" 
+                                                            // height="100%" 
                                                             volume={volumeLevel}
                                                             playing={playing}
                                                             progressInterval={500}
@@ -251,7 +251,7 @@ export const Player = () => {
                                                             onProgress={handleProgress}
                                                             onSeek={e => console.log('onSeeking??', e)}/>       
                                                     </Grid> : 
-                                                    <Grid item height={'100%'} style={{position:'absolute', top:'50%', left: '50%'}}>
+                                                    <Grid item /*height={'100%'}*/ style={{position:'absolute', top:'50%', left: '50%'}}>
                                                         <CircularProgress style={{color:'white'}} />
                                                     </Grid>
                     }

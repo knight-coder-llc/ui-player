@@ -11,8 +11,6 @@ const Box = styled('div')(compose(spacing, palette));
 export const Layout = ({children}) => (
     <React.Fragment>
       <CssBaseline />
-      <Container maxWidth="lg" >
         { children }
-      </Container>
     </React.Fragment>
 )
