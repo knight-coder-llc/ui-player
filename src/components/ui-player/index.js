@@ -265,7 +265,7 @@ export const Player = () => {
                     {
                         (!backdropOpen) && <Grid>
                                                 <Typography component="div" >
-                                                    <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="white">
+                                                    <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="black">
                                                         <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
                                                     </Box>
                                                 </Typography>
@@ -288,23 +288,6 @@ export const Player = () => {
                                 </Tooltip>
                                 
                             </Grid>
-                            {/* <Grid item>
-                                <Tooltip title="rewind" arrow>
-                                    <Button 
-                                        className={classes.rewind} 
-                                        id="rewind"
-                                        color="primary" 
-                                        size="large"
-                                        variant="contained"
-                                        value={played}
-                                        onMouseDown={handleSeekMouseDown}
-                                        onChange={handleSeekChange}
-                                        onMouseUp={handleSeekMouseUp} 
-                                        >
-                                            <DoubleArrowIcon/>
-                                    </Button>
-                                </Tooltip>
-                            </Grid> */}
                             <Grid item>
                                 <Tooltip title="play/pause" arrow>
                                     <Button color="primary" variant="contained" onClick={handlePlayPause} size="large"> {!playing ? <PlayCircleFilledIcon/> : <PauseCircleFilledIcon />}</Button>
@@ -338,7 +321,7 @@ export const Player = () => {
                         
                         
                     </ButtonGroup>
-                    <ButtonGroup style={{width: '40%', color: '#fff'}} id="controls">
+                    <ButtonGroup style={{width: '40%', color: '#000'}} id="controls">
                         <Grid container spacing={2} >
                             <Grid item>
                                 <VolumeDown />
