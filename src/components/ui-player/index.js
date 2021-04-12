@@ -261,11 +261,6 @@ export const Player = () => {
                             <ToggleButton value={0}  className={classes.toggles}>Original Audio</ToggleButton>
                             <ToggleButton value={1} >Final Audio</ToggleButton>    
                         </ToggleButtonGroup>
-                        <Grid item>
-                            <Tooltip title="fullscreen" arrow>
-                                <Button color="primary" variant="contained" onClick={handleBackdropToggle} size="large"><FullscreenIcon/></Button>
-                            </Tooltip>
-                        </Grid>
                     </ButtonGroup>
                     {
                         // (!backdropOpen) && <Grid>
