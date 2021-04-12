@@ -189,13 +189,13 @@ export const Player = () => {
                                                 ref={playerRef}
                                                 className="react-player"
                                                 url={videoSrc}
-                                                controls={false} 
+                                                controls={true} 
                                                 muted={mute}
                                                 width="100%" 
                                                 height="100%" 
                                                 volume={volumeLevel}
                                                 playing={playing}
-                                                progressInterval={2000}
+                                                progressInterval={1000}
                                                 onReady={() => {
                                                     // setting track
                                                     if(trackUpdated) {
@@ -224,13 +224,13 @@ export const Player = () => {
                                                             ref={playerRef}
                                                             className="react-player"
                                                             url={videoSrc}
-                                                            controls={false}
+                                                            controls={true}
                                                             muted={mute} 
                                                             width="100%" 
                                                             // height="100%" 
                                                             volume={volumeLevel}
                                                             playing={playing}
-                                                            progressInterval={500}
+                                                            progressInterval={1000}
                                                             onReady={() => {
                                                                 if(trackUpdated) {
                                                                     const seconds = (duration * played);
@@ -252,7 +252,7 @@ export const Player = () => {
                                                             onSeek={e => console.log('onSeeking??', e)}/>       
                                                     </Grid> : 
                                                     <Grid item /*height={'100%'}*/ style={{position:'absolute', top:'50%', left: '50%'}}>
-                                                        <CircularProgress style={{color:'white'}} />
+                                                        <CircularProgress style={{color:'#000'}} />
                                                     </Grid>
                     }
                     </Grid>
@@ -261,19 +261,24 @@ export const Player = () => {
                             <ToggleButton value={0}  className={classes.toggles}>Original Audio</ToggleButton>
                             <ToggleButton value={1} >Final Audio</ToggleButton>    
                         </ToggleButtonGroup>
+                        <Grid item>
+                            <Tooltip title="fullscreen" arrow>
+                                <Button color="primary" variant="contained" onClick={handleBackdropToggle} size="large"><FullscreenIcon/></Button>
+                            </Tooltip>
+                        </Grid>
                     </ButtonGroup>
                     {
-                        (!backdropOpen) && <Grid>
-                                                <Typography component="div" >
-                                                    <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="black">
-                                                        <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
-                                                    </Box>
-                                                </Typography>
-                                            </Grid> 
+                        // (!backdropOpen) && <Grid>
+                        //                         <Typography component="div" >
+                        //                             <Box fontWeight={500} m={1} fontSize="h6.fontSize" lineHeight={2} color="black">
+                        //                                 <Duration seconds={duration * (1 - played)} /> / <Duration seconds={duration } />
+                        //                             </Box>
+                        //                         </Typography>
+                        //                     </Grid> 
                     }
                     
                     
-                    <ButtonGroup color="primary" aria-label="contained primary button group" id="controls" >
+                    {/* <ButtonGroup color="primary" aria-label="contained primary button group" id="controls" >
                     
                         <Grid container spacing={2}>
                             <Grid item>
@@ -314,9 +319,6 @@ export const Player = () => {
                                     <Button color="primary" variant="contained" onClick={handleBackdropToggle} size="large"><FullscreenIcon/></Button>
                                 </Tooltip>
                             </Grid>
-                            {/* <Grid item>
-                                <BottomDrawer />
-                            </Grid> */}
                         </Grid>
                         
                         
@@ -333,7 +335,7 @@ export const Player = () => {
                                 {(!mute) ? <Tooltip title="click to mute" placement={'top-start'}><VolumeUp /></Tooltip> : <Tooltip title="click to unmute" placement={'top-start'}><VolumeOffIcon /></Tooltip>}
                             </Grid>
                         </Grid>
-                    </ButtonGroup>
+                    </ButtonGroup> */}
                     
                 </div>
                 

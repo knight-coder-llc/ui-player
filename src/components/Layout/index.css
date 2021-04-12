@@ -34,17 +34,17 @@ body {
 Fullscreen Pseudo-class: 
 https://developer.mozilla.org/en-US/docs/Web/CSS/:fullscreen 
 */
-#controls:-moz-full-screen { position: fixed; }
+/* #controls:-moz-full-screen { position: fixed; }
 #controls:-webkit-full-screen { position: fixed; }
 #controls:-ms-fullscreen { position: fixed; }
-#controls:fullscreen { position: fixed; }
+#controls:fullscreen { position: fixed; } */
 /* 
 Special Shadow DOM Settings to Override Default Controls: 
 https://css-tricks.com/custom-controls-in-html5-video-full-screen/ 
 */
-video::-webkit-media-controls {
+/* video::-webkit-media-controls {
     display:none !important;
 }
 video::-webkit-media-controls-enclosure { display:none !important; }
 .react-player:fullscreen {z-index: 2147483646!important;}
-#controls { z-index: 2147483647; }
+#controls { z-index: 2147483647; } */
