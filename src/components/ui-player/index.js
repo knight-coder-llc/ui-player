@@ -23,6 +23,7 @@ import { add, subtract, isNil, equals } from 'ramda';
 import { ffmpegTranscodeFile } from '../../utils';
 import logo from '../../assets/AVlogo-2.png';
 import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
+import originalVideo from '../../assets/videos/steel-will-original-sample.mov';
 import ReplayIcon from '@material-ui/icons/Replay';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -73,16 +74,16 @@ export const Player = () => {
     const [fullScreenSeek, setFullScreenSeek] = useState(false);
     const [pageSeek, setPageSeek] = useState(false);
     const [videoSrc, setVideoSrc] = useState(sampleVideo);
-    const [originalSrc, setOriginalVideoSrc] = useState(null);
+    const [originalSrc, setOriginalVideoSrc] = useState(originalVideo);
     const [backdropOpen, setBackdropOpen] = useState(false);
     const [mute, setMute] = useState(false);
 
     // mount and unmount lifecycle.
     useEffect(async () => {
-        if(isNil(originalSrc)) {
-            const original = await ffmpegTranscodeFile(sampleVideo);
-            setOriginalVideoSrc(original);
-        }
+        // if(isNil(originalSrc)) {
+        //     const original = await ffmpegTranscodeFile(sampleVideo);
+        //     setOriginalVideoSrc(original);
+        // }
 
         document.addEventListener('keydown', onKeyPress);
         return () => {
