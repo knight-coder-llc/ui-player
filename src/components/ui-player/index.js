@@ -22,8 +22,8 @@ import Duration, { format } from './Duration'
 import { add, subtract, isNil, equals } from 'ramda';
 import { ffmpegTranscodeFile } from '../../utils';
 import logo from '../../assets/AVlogo-2.png';
-import sampleVideo from '../../assets/videos/steel-will-sample-dual-mix.mov';
-import originalVideo from '../../assets/videos/steel-will-original-sample.mov';
+import sampleVideo from '../../assets/videos/steel-will-final-audio-video.mov';
+import originalVideo from '../../assets/videos/steel-will-original-audio-video.mov';
 import ReplayIcon from '@material-ui/icons/Replay';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -84,7 +84,8 @@ export const Player = () => {
         //     const original = await ffmpegTranscodeFile(sampleVideo);
         //     setOriginalVideoSrc(original);
         // }
-
+        console.log('original', videoSrc)
+        console.log('original', originalSrc)
         document.addEventListener('keydown', onKeyPress);
         return () => {
             document.removeEventListener('keydown', onKeyPress);
