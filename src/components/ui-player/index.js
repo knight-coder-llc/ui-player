@@ -22,8 +22,8 @@ import Duration, { format } from './Duration'
 import { add, subtract, isNil, equals } from 'ramda';
 import { ffmpegTranscodeFile } from '../../utils';
 import logo from '../../assets/AVlogo-2.png';
-import sampleVideo from '../../assets/videos/steel-will-final-audio-video.mov';
-import originalVideo from '../../assets/videos/steel-will-original-audio-video.mov';
+import sampleVideo from '../../assets/videos/steele-will-final-audio-video.mov';
+import originalVideo from '../../assets/videos/steele-will-original-audio-video.mov';
 import ReplayIcon from '@material-ui/icons/Replay';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -197,7 +197,7 @@ export const Player = () => {
                                                 height="100%" 
                                                 volume={volumeLevel}
                                                 playing={playing}
-                                                progressInterval={1000}
+                                                progressInterval={500}
                                                 onReady={() => {
                                                     // setting track
                                                     if(trackUpdated) {
@@ -232,7 +232,7 @@ export const Player = () => {
                                                             // height="100%" 
                                                             volume={volumeLevel}
                                                             playing={playing}
-                                                            progressInterval={1000}
+                                                            progressInterval={500}
                                                             onReady={() => {
                                                                 if(trackUpdated) {
                                                                     const seconds = (duration * played);
