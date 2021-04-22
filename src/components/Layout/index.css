@@ -1,15 +1,10 @@
 body {
     background-image: url('../../assets/background.jpg');
-    /* background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%); */
-    /* background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%); */
-    /* background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%) */
 }
 .player-wrapper { 
     position: relative;
     padding-top: 56.25%;
-    width: 100%;
-    /* height: 100%; */
-    
+    width: 100%;  
 }
 
 .react-player {
@@ -20,15 +15,15 @@ body {
   }
   .MuiButton-containedPrimary {
     color: #fff;
-    background-color: #18A4CE!important;
+    background-color: grey!important;
 }
 
 .MuiToggleButton-root {
     color: white!important;
-    background-color: #18A4CE!important;
+    background-color: grey!important;
 }
 
-.Mui-Selected { background-color: #ce1133!important; }
+.Mui-Selected { background-color: green!important; }
 
 /* 
 Fullscreen Pseudo-class: 
